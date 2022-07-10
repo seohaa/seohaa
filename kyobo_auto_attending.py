@@ -13,8 +13,8 @@ from selenium.webdriver.chrome.service import Service
 # pip install chromedriver_autoinstaller
 
 print('교보문고 자동 출석 프로그램')
-kyobo_id = 'rmswn96'
-kyobo_pw = 'tomato119'
+kyobo_id = input('아이디 입력 : ')
+kyobo_pw = input('비번 입력 : ')
 
 browser = None
 sleep_time = 2
