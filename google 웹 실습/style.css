@@ -1,0 +1,16 @@
+h1{
+    text-align: center;
+    margin-top: 150px !important;
+
+}
+
+.search-bar{
+    width : 500px;
+
+}
+.form-control{
+    width: 400px;
+    height: 35px;
+    padding-left: 2px;
+    border-left-width: 5px;
+}
