@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div id="map" style="width:100%;height:500px;"></div>
+    <p>
+        <button onclick="setCenter()">지도 중심좌표 이동시키기</button>
+    </p>
+    <p>
+        <button onclick="zoomIn()">지도레벨 - 1</button>
+        <button onclick="zoomOut()">지도레벨 + 1</button>
+        <span id="maplevel"></span>
+    </p>
+    <div id="clickLatlng"></div>
+    <p style="margin-top:-12px">
+        <em class="link">
+            <a href="javascript:void(0)" onclick="window.open('http://fiy.daum.net/fiy/map/CsGeneral.daum', '_blank', 'width=981, height=650')">
+            </a>
+        </em>
+    </p>
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=a0c2358219b43a34d295dd98af5e43b2&libraries=services,clusterer,drawing"></script>
+    
+    
+    <script>
+        var mapContainer = document.getElementById('map'), // 지도를 표시할 div 
+            mapOption = { 
+            center: new kakao.maps.LatLng(33.38, 126.570667), // 지도의 중심좌표
+            level: 10 // 지도의 확대 레벨
+            };
+
+        //지도 생성 및 객체 리턴
+        var map = new kakao.maps.Map(mapContainer, mapOption); 
+
+        //지도 이동시키기
+        function setCenter(){
+            var moveLatLon = new kakao.maps.LatLng(33.38, 126.570888);
+            map.setCenter(moveLatLon)
+        }
+
+        //지도레벨 바꾸기
+        function zoomIn(){
+            var level = map.getLevel();
+            map.setLevel(level - 1);
+        }
+        function zoomOut(){
+            var level = map.getLevel();
+            map.setLevel(level + 1);
+        }
+        
+        //지도 확대 축소 제어 컨트롤러 생성
+        var zoomControl = new kakao.maps.ZoomControl();
+        map.addControl(zoomControl, kakao.maps.ControlPosition.RIGHT)
+
+
+
+        //마커, 인포 표시
+        var positions = [
+        {
+            content: '<div>카카오</div>', 
+            address: '제주특별자치도 제주시 첨단로 242'
+        },
+        {
+            content: '<div>지도</div>', 
+            address: '제주특별자치도 서귀포시 안덕면 산방로 141'
+        },
+        {
+            content: '<div>길찾기</div>', 
+            address: '제주특별자치도 서귀포시 중문관광로 154-17'
+        },
+        {
+            content: '<div>hi</div>',
+            address: '제주특별자치도 제주시 한림읍 한림로 542-1'
+        }
+    ];
+
+
+    function getInfo(address){
+        console.log(address)
+        for (var i = 0; i < positions.length; i++){
+            console.log(i.toString() + positions[i].address)
+            if(address.trim() == positions[i].address.trim()){
+                return positions[i].content
+            }
+        }
+        return ''
+    };
+    for (var i = 0; i < positions.length; i ++) {
+        var geocoder = new kakao.maps.services.Geocoder();
+        var content = positions[i].content;
+        geocoder.addressSearch(positions[i].address, function(result, status){
+            if(status == kakao.maps.services.Status.OK){
+                var coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+                console.log(result[0])
+                var marker = new kakao.maps.Marker({
+                    map: map,
+                    position: coords
+
+                })
+                //인포텍스트
+                var infowindow = new kakao.maps.InfoWindow({
+                    content : getInfo(result[0].address_name)
+                });
+                //console.log(positions[i].address)
+                // 리스너로 mouseover/mouseout 이벤트 등록
+                kakao.maps.event.addListener(marker, 'mouseover', makeOverListener(map, marker, infowindow));
+                kakao.maps.event.addListener(marker, 'mouseout', makeOutListener(infowindow));
+            }
+        })
+    }
+
+    // 인포윈도우를 표시하는 클로저(내부함수가 외부함수의 맥락에 접근)를 만드는 함수
+    function makeOverListener(map, marker, infowindow) {
+        return function() {
+            infowindow.open(map, marker);
+        };
+    }
+    // 인포윈도우를 닫는 클로저를 만드는 함수
+    function makeOutListener(infowindow) {
+        return function() {
+            infowindow.close();
+        };
+    }
+    
+    </script>
+    </section>
+</body>
+</html>
